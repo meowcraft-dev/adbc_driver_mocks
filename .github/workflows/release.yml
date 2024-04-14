@@ -21,8 +21,8 @@ jobs:
         job:
           - {os: "macos-12", goos: "darwin", goarch: "amd64", name: "x86_64-apple-darwin", suffix: "dylib"}
           - {os: "macos-14", goos: "darwin", goarch: "arm64", name: "aarch64-apple-darwin", suffix: "dylib"}
-          - {os: "ubuntu-latest", goos: "linux", goarch: "amd64", name: "x86_64-linux-gnu", suffix: "so"}
-          - {os: "windows-latest", goos: "windows", goarch: "amd64", name: "x86_64-windows-msvc", suffix: "dll"}
+          - {os: "ubuntu-20.04", goos: "linux", goarch: "amd64", name: "x86_64-linux-gnu", suffix: "so"}
+          - {os: "windows-2019", goos: "windows", goarch: "amd64", name: "x86_64-windows-msvc", suffix: "dll"}
       fail-fast: false
     env:
       CGO_ENABLED: "1"
