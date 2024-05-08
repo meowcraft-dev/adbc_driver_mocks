@@ -1,0 +1,48 @@
+name: auto-nightly-release
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 4 * * *"
+
+jobs:
+  auto-update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.AUTO_UPDATE_TOKEN }}
+
+      - name: Get latest version
+        id: mock-version
+        run: |
+            git clone --branch feat-mocks --depth 1 https://github.com/meowcraft-dev/arrow-adbc.git
+            cd arrow-adbc
+            LATEST_COMMIT_DATE=$(git log -1 --date=format:"%Y%m%d" --format="%ad")
+            CURRENT_DATE=$(date +"%Y%m%d")
+            echo "Latest commit date is $LATEST_COMMIT_DATE"
+            echo "Current date is $CURRENT_DATE"
+            if [ "$LATEST_COMMIT_DATE" == "$CURRENT_DATE" ]; then
+              echo "will update nightly-$LATEST_COMMIT_DATE"
+              echo "tag=nightly-${LATEST_COMMIT_DATE}" >> $GITHUB_OUTPUT
+              echo "has_updates=true" >> $GITHUB_OUTPUT
+            else
+              echo "has_updates=false" >> $GITHUB_OUTPUT
+            fi
+
+      - name: Check if has updates and if already tagged
+        if: steps.mock-version.outputs.has_updates == 'true'
+        uses: mukunku/tag-exists-action@v1.5.0
+        id: check-tag
+        with: 
+          tag: ${{ steps.mock-version.outputs.tag }}
+          repo: 'meowcraft-dev/adbc_driver_mocks'
+
+      - name: Update if tag not exists
+        if: steps.mock-version.outputs.has_updates == 'true' && steps.check-tag.outputs.exists == 'false'
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git tag ${{ steps.mock-version.outputs.tag }}
+          git push origin ${{ steps.mock-version.outputs.tag }}
