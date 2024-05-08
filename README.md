@@ -38,6 +38,10 @@ A list without angle brackets will default to `list<1:int8>`.
 
 Structs operate similarly to lists but without a specified length. To define a struct containing an int8 and a boolean value, use the format: `struct<int8,bool>`.
 
+## Special use cases
+
+If the query string is `passthrough`, the query will return anything that was passed to Bind or BindStream as the query result. This is useful for testing the Bind and BindStream functions.
+
 # Supported DataTypes
 
 Here is a list of supported DataTypes in the query
