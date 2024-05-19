@@ -62,13 +62,14 @@ Here is a list of supported DataTypes in the query
 |date64|arrow.PrimitiveTypes.Date64|
 |binary|arrow.BinaryTypes.Binary|
 |string|arrow.BinaryTypes.String|
-|daytimeinterval|arrow.FixedWidthTypes.DayTimeInterval|
 |duration_s|arrow.FixedWidthTypes.Duration_s|
 |duration_ms|arrow.FixedWidthTypes.Duration_ms|
 |duration_us|arrow.FixedWidthTypes.Duration_us|
 |duration_ns|arrow.FixedWidthTypes.Duration_ns|
+|interval_month|arrow.FixedWidthTypes.MonthInterval|
+|interval_daytime|arrow.FixedWidthTypes.DayTimeInterval|
+|interval_monthdaynano|arrow.FixedWidthTypes.MonthDayNanoInterval|
 |float16|arrow.FixedWidthTypes.Float16|
-|monthInterval|arrow.FixedWidthTypes.MonthInterval|
 |time32s|arrow.FixedWidthTypes.Time32s|
 |time32ms|arrow.FixedWidthTypes.Time32ms|
 |time64us|arrow.FixedWidthTypes.Time64us|
