@@ -78,3 +78,130 @@ Here is a list of supported DataTypes in the query
 |interval_month|arrow.FixedWidthTypes.MonthInterval|
 |interval_daytime|arrow.FixedWidthTypes.DayTimeInterval|
 |interval_monthdaynano|arrow.FixedWidthTypes.MonthDayNanoInterval|
+|sample_list|arrow.ListOf(arrow.PrimitiveTypes.Int32)|
+|sample_list_with_struct|See below|
+|sample_nested_list|arrow.ListOf(arrow.ListOf(arrow.PrimitiveTypes.Int32))|
+|sample_list_view|arrow.ListViewOf(arrow.PrimitiveTypes.Int32)|
+|sample_large_list_view|arrow.LargeListViewOf(arrow.PrimitiveTypes.Int32)|
+|sample_fixed_size_list|arrow.FixedSizeListOf(3, arrow.PrimitiveTypes.Int32)|
+|sample_nested_fixed_size_list|arrow.FixedSizeListOf(3,arrow.FixedSizeListOf(3, arrow.PrimitiveTypes.Int32))|
+|sample_run_end_encoded_array|arrow.RunEndEncodedOf(arrow.PrimitiveTypes.Int32, arrow.PrimitiveTypes.Float32)|
+|sample_dictionary_encoded_array|See below|
+|sample_dense_union|See below|
+|sample_sparse_union|See below|
+|null|arrow.Null|
+
+## Sample DataTypes
+
+### sample_list_with_struct
+> structs of two timestamps and an int32 nested inside lists
+
+Schema:
+```go
+arrow.ListOf(
+    arrow.StructOf(
+        arrow.Field{Name: "start_time", Type: arrow.FixedWidthTypes.Timestamp_s},
+        arrow.Field{Name: "end_time", Type: arrow.FixedWidthTypes.Timestamp_s},
+        arrow.Field{Name: "data_points", Type: arrow.PrimitiveTypes.Int32},
+    )
+)
+```
+
+Example:
+
+When `row == 3`
+
+```
+sample_list_with_struct: [[    -- is_valid: all not null
+    -- child 0 type: timestamp[s, tz=UTC]
+[1970-01-01 00:00:00]
+    -- child 1 type: timestamp[s, tz=UTC]
+[1970-01-01 00:01:40]
+    -- child 2 type: int32
+[0],    -- is_valid: all not null
+    -- child 0 type: timestamp[s, tz=UTC]
+[1970-01-01 00:00:01]
+    -- child 1 type: timestamp[s, tz=UTC]
+[1970-01-01 00:01:41]
+    -- child 2 type: int32
+[1],    -- is_valid: all not null
+    -- child 0 type: timestamp[s, tz=UTC]
+[1970-01-01 00:00:02]
+    -- child 1 type: timestamp[s, tz=UTC]
+[1970-01-01 00:01:42]
+    -- child 2 type: int32
+[2]]]
+```
+
+### sample_dictionary_encoded_array
+> [dictionary encoded](https://arrow.apache.org/docs/format/Columnar.html#dictionary-encoded-layout) array of strings
+
+Schema:
+```go
+arrow.DictionaryType{
+    IndexType: arrow.PrimitiveTypes.Int32,
+    ValueType: arrow.BinaryTypes.String,
+},
+```
+
+Example:
+
+When `row == 3`
+
+```
+sample_dictionary_encoded_array: [  -- dictionary:
+["hello","goodbye"]  -- indices:
+[0,1,0]]
+```
+
+### sample_dense_union
+> [dense union](https://arrow.apache.org/docs/format/Columnar.html#dense-union) of int32 and string
+
+Schema:
+```go
+arrow.DenseUnionOf(
+    []arrow.Field{
+        {Name: "a", Type: arrow.PrimitiveTypes.Int32},
+        {Name: "b", Type: arrow.BinaryTypes.String},
+    },
+    []arrow.UnionTypeCode{0, 1},
+)
+```
+
+Example:
+
+When `row == 3`
+
+```
+sample_dense_union: [  -- is_valid: all not null  -- type_ids: [0,1,0]  -- value_offsets: [0,0,1]
+  -- child 0 type: int32
+[0,1,2]
+  -- child 1 type: string
+["str%d0","str%d1","str%d2"]]
+```
+
+### sample_sparse_union
+> similar to dense union, a [sparse union](https://arrow.apache.org/docs/format/Columnar.html#sparse-union) of int32 and string
+
+Schema:
+```go
+arrow.SparseUnionOf(
+    []arrow.Field{
+        {Name: "a", Type: arrow.PrimitiveTypes.Int32},
+        {Name: "b", Type: arrow.BinaryTypes.String},
+    },
+    []arrow.UnionTypeCode{0, 1},
+)
+```
+
+Example:
+
+When `row == 3`
+
+```
+sample_sparse_union: [  -- is_valid: all not null  -- type_ids: [0,1,0]
+  -- child 0 type: int32
+[0,null,1]
+  -- child 1 type: string
+[null,"str%d0",null]]
+```
