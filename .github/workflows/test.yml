@@ -18,7 +18,7 @@ jobs:
     steps:
       - name: fetch feat-mocks branch
         run: |
-          git clone --branch feat-mocks-antlr-dev --depth 1 https://github.com/meowcraft-dev/arrow-adbc.git
+          git clone --branch feat-mocks --depth 1 https://github.com/meowcraft-dev/arrow-adbc.git
       - uses: actions/setup-go@v5
         with:
           go-version: ${{ env.GO_VERSION }}
